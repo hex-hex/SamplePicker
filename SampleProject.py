@@ -1,22 +1,29 @@
 import sqlite3
+import os
 from skimage import io
+
 class Image():
     def __init__(self):
         self._filePath = ''
+        self._imgData = None
 
     @property
     def file_path(self):
         pass
+
     @file_path.setter
     def file_path(self, value):
-        self._filePath = value
+        if os.path.isfile(value):
+            self._filePath = value
+        else:
+            raise NameError('File does not exist')
 
     @property
     def file_data(self):
         pass
 
     def load_img(self):
-        pass
+        self._imgData = io.imread(self._filePath)
 
 
 class ProjectSet():

@@ -5,9 +5,12 @@ from PyQt5.QtGui import *
 class ProjectDialog():
     def __init__(self):
         pass
+    def iniUI(self):
+        pass
 
 class App(QMainWindow)
     def __init__(self):
         pass
     def initUI(self):
+
         pass
