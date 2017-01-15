@@ -2,11 +2,14 @@ import sqlite3
 from skimage import io
 class Image():
     def __init__(self):
-        pass
+        self._filePath = ''
 
     @property
     def file_path(self):
         pass
+    @file_path.setter
+    def file_path(self, value):
+        self._filePath = value
 
     @property
     def file_data(self):
