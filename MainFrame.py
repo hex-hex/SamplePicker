@@ -1,4 +1,5 @@
 import sys
+import webbrowser
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from SampleProject import *
@@ -40,9 +41,16 @@ class MainApp(QMainWindow):
         thisMenu.addAction(exitAction)
 
         thisMenu = self.menuBar().addMenu('&Help')
-        thisMenu.addAction(QAction('&Help', self))
+        helpAction = QAction('&Help', self)
+        helpAction.setStatusTip('Link to my page on GitHub')
+        helpAction.setShortcut('Ctrl+h')
+        helpAction.triggered.connect(self.helpAct)
+        thisMenu.addAction(helpAction)
         thisMenu.addSeparator()
-        thisMenu.addAction(QAction('&About...', self))
+        aboutAction = QAction('&About...', self)
+        aboutAction.setShortcut('Ctrl+A')
+        aboutAction.setStatusTip('About this application.')
+        thisMenu.addAction(aboutAction)
 
         self._windowSize = [600, 400]
         self.resize(self._windowSize[0], self._windowSize[1])
@@ -52,6 +60,10 @@ class MainApp(QMainWindow):
         self.statusBar().showMessage(self._currentStatusMessgae)
 
         self.show()
+
+    def helpAct(self):
+        webbrowser.open('https://github.com/hex-hex/SamplePicker')
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
