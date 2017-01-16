@@ -1,5 +1,6 @@
 import sys
 import webbrowser
+from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from SampleProject import *
@@ -44,7 +45,7 @@ class MainApp(QMainWindow):
         helpAction = QAction('&Help', self)
         helpAction.setStatusTip('Link to my page on GitHub')
         helpAction.setShortcut('Ctrl+h')
-        helpAction.triggered.connect(self.helpAct)
+        helpAction.triggered.connect(self.menuHelpAction)
         thisMenu.addAction(helpAction)
         thisMenu.addSeparator()
         aboutAction = QAction('&About...', self)
@@ -52,8 +53,13 @@ class MainApp(QMainWindow):
         aboutAction.setStatusTip('About this application.')
         thisMenu.addAction(aboutAction)
 
-        self._windowSize = [600, 400]
-        self.resize(self._windowSize[0], self._windowSize[1])
+        self._windowSize = QSize(1024, 600)
+        self.resize(self._windowSize.width(), self._windowSize.height())
+
+        self._hBox = QHBoxLayout(self)
+        self._formerLabel = QLabel()
+        self._buttonBox = QVBoxLayout()
+        self._newerLabel = QLabel()
 
         self._currentStatusMessgae = 'Everything is ready.'
 
@@ -61,8 +67,18 @@ class MainApp(QMainWindow):
 
         self.show()
 
-    def helpAct(self):
+    def menuHelpAction(self):
         webbrowser.open('https://github.com/hex-hex/SamplePicker')
+
+    def resizeEvent(self, *args, **kwargs):
+        if self._windowSize.width() > self.size().width():
+            self.resize(self._windowSize.width(), self.size().height())
+        if self._windowSize.height() > self.size().height():
+            self.resize(self.size().width(), self._windowSize.height())
+        print(self.size())
+
+    def redjustWiget(self):
+        pass
 
 
 if __name__ == "__main__":
