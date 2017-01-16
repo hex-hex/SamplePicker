@@ -38,7 +38,6 @@ class ProjectSet():
     def newer(self):
         pass
 
-
     def load_img(self):
         pass
 
