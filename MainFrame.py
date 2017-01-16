@@ -1,6 +1,11 @@
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from SampleProject import *
+
+class AboutDialog():
+    def __init__(self):
+        pass
 
 class ProjectDialog():
     def __init__(self):
@@ -8,10 +13,30 @@ class ProjectDialog():
     def iniUI(self):
         pass
 
-class App(QMainWindow)
+class MainApp(QMainWindow):
     def __init__(self):
-        pass
+        super().__init__()
+        self.initUI()
+
     def initUI(self):
-        fileMenu = self.menuBar().addMenu('&File')
-        newProjectMenu = fileMenu.addMenu('&New Project')
-        openProjectMenu = fileMenu.addMenu('&Open Project')
+
+        self.setWindowTitle('C D S P  by hugh')
+
+        thisMenu = self.menuBar().addMenu('&File')
+        thisMenu.addAction(QAction('&New Project', self))
+        thisMenu.addAction(QAction('&Open Project', self))
+        thisMenu.addSeparator()
+        thisMenu.addAction(QAction('&Exit', self))
+
+        thisMenu = self.menuBar().addMenu('&Help')
+        thisMenu.addAction(QAction('&Help', self))
+        thisMenu.addSeparator()
+        thisMenu.addAction(QAction('&About...', self))
+
+        self.show()
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    ex = MainApp()
+    sys.exit(app.exec_())
+
