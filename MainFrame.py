@@ -12,5 +12,6 @@ class App(QMainWindow)
     def __init__(self):
         pass
     def initUI(self):
-
-        pass
+        fileMenu = self.menuBar().addMenu('&File')
+        newProjectMenu = fileMenu.addMenu('&New Project')
+        openProjectMenu = fileMenu.addMenu('&Open Project')
