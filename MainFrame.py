@@ -4,20 +4,12 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from SampleProject import *
-
-class AboutDialog():
-    def __init__(self):
-        pass
-
-class ProjectDialog():
-    def __init__(self):
-        pass
-    def iniUI(self):
-        pass
+from ProjectDialog import *
+from AboutDialog import *
 
 class MainApp(QMainWindow):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super(MainApp, self).__init__(parent)
         self.initUI()
 
     def initUI(self):
@@ -28,6 +20,7 @@ class MainApp(QMainWindow):
         newAction = QAction('&New Project', self)
         newAction.setStatusTip('Create a new project.')
         newAction.setShortcut('Ctrl+N')
+        newAction.triggered.connect(self.menuNewProject)
         thisMenu.addAction(newAction)
         openAction = QAction('&Open Project', self)
         openAction.setStatusTip('Open an exist project.')
@@ -43,7 +36,7 @@ class MainApp(QMainWindow):
 
         thisMenu = self.menuBar().addMenu('&Help')
         helpAction = QAction('&Help', self)
-        helpAction.setStatusTip('Link to my page on GitHub')
+        helpAction.setStatusTip('Link to the page on GitHub')
         helpAction.setShortcut('Ctrl+h')
         helpAction.triggered.connect(self.menuHelpAction)
         thisMenu.addAction(helpAction)
@@ -51,10 +44,13 @@ class MainApp(QMainWindow):
         aboutAction = QAction('&About...', self)
         aboutAction.setShortcut('Ctrl+A')
         aboutAction.setStatusTip('About this application.')
+        aboutAction.triggered.connect(self.menuAboutAction)
         thisMenu.addAction(aboutAction)
 
         self._windowSize = QSize(1024, 600)
         self.resize(self._windowSize.width(), self._windowSize.height())
+
+        self._mainProject = None
 
         self._hBox = QHBoxLayout(self)
         self._formerLabel = QLabel()
@@ -66,6 +62,20 @@ class MainApp(QMainWindow):
         self.statusBar().showMessage(self._currentStatusMessgae)
 
         self.show()
+
+    def menuNewProject(self):
+        newDialog = ProjectDialog()
+        newDialog.exec_()
+        self._mainProject = ProjectSet()
+
+
+
+    def menuOpenProject(self):
+        pass
+
+    def menuAboutAction(self):
+        aboutDialog = AboutDialog()
+        aboutDialog.exec_()
 
     def menuHelpAction(self):
         webbrowser.open('https://github.com/hex-hex/SamplePicker')
