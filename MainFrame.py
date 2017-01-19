@@ -24,7 +24,9 @@ class MainApp(QMainWindow):
         thisMenu.addAction(newAction)
         openAction = QAction('&Open Project', self)
         openAction.setStatusTip('Open an exist project.')
+
         openAction.setShortcut('Ctrl+O')
+        openAction.triggered.connect(self.menuOpenProject)
         thisMenu.addAction(openAction)
         thisMenu.addSeparator()
 
@@ -68,10 +70,11 @@ class MainApp(QMainWindow):
         newDialog.exec_()
         self._mainProject = ProjectSet()
 
-
-
     def menuOpenProject(self):
-        pass
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open a exist project file", "",
+                                                  "DataBase Files (*.db);;All Files (*)")
+        if fileName:
+            print(fileName)
 
     def menuAboutAction(self):
         aboutDialog = AboutDialog()
