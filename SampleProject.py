@@ -40,11 +40,20 @@ class Image():
     def load_img(self):
         self._imgData = io.imread(self._filePath)
 
-
 class ProjectSet():
     def __init__(self):
         self._formerImg = Image()
         self._newerImg = Image()
+        self._dbPathName = ''
+        self._listLocation = []
+        self._sampleSize = 49
+
+    def addLocation(self, x, y, isSame):
+        self._listLocation.append([x, y, isSame])
+
+    @property
+    def databasePath(self):
+        return self._dbPathName
 
     @property
     def former(self):
@@ -66,4 +75,5 @@ class ProjectSet():
         pass
 
     def exportDB(self):
+
         pass

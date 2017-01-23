@@ -54,10 +54,23 @@ class MainApp(QMainWindow):
 
         self._mainProject = None
 
-        self._hBox = QHBoxLayout(self)
-        self._formerLabel = QLabel()
-        self._buttonBox = QVBoxLayout()
-        self._newerLabel = QLabel()
+        self._formerArea = QScrollArea(self)
+        self._nextSampleButton = QPushButton('Next Sample', self)
+        self._SameSampleButton = QPushButton('Same Type', self)
+        self._DifferentSampleButton = QPushButton('Different Type', self)
+        self._newerArea = QScrollArea(self)
+
+        self._menuHeight = 20
+        self._formerArea.resize((self.size().width() - 150)/2, self.size().height() - self._menuHeight)
+        self._formerArea.move(0, self._menuHeight)
+        self._nextSampleButton.resize(150, 25)
+        self._nextSampleButton.move((self.size().width() - 150)/2, self._menuHeight)
+        self._SameSampleButton.resize(150, 25)
+        self._SameSampleButton.move((self.size().width() - 150)/2, self._menuHeight + 35)
+        self._DifferentSampleButton.resize(150, 25)
+        self._DifferentSampleButton.move((self.size().width() - 150)/2, self._menuHeight + 70)
+        self._newerArea.resize((self.size().width() - 150)/2, self.size().height())
+        self._newerArea.move((self.size().width() - 150)/2 + 150, self._menuHeight - self._menuHeight)
 
         self._currentStatusMessgae = 'Everything is ready.'
 
@@ -88,7 +101,17 @@ class MainApp(QMainWindow):
             self.resize(self._windowSize.width(), self.size().height())
         if self._windowSize.height() > self.size().height():
             self.resize(self.size().width(), self._windowSize.height())
-        print(self.size())
+
+        self._formerArea.resize((self.size().width() - 150)/2, self.size().height())
+        self._formerArea.move(0, self._menuHeight)
+        self._nextSampleButton.resize(150, 25)
+        self._nextSampleButton.move((self.size().width() - 150)/2, self._menuHeight)
+        self._SameSampleButton.resize(150, 25)
+        self._SameSampleButton.move((self.size().width() - 150)/2, self._menuHeight + 35)
+        self._DifferentSampleButton.resize(150, 25)
+        self._DifferentSampleButton.move((self.size().width() - 150)/2, self._menuHeight + 70)
+        self._newerArea.resize((self.size().width() - 150)/2, self.size().height())
+        self._newerArea.move((self.size().width() - 150)/2 + 150, self._menuHeight)
 
     def redjustWiget(self):
         pass
