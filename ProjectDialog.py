@@ -4,6 +4,7 @@ from SampleProject import *
 class ProjectDialog(QDialog):
     def __init__(self, parent=None):
         super(ProjectDialog, self).__init__(parent)
+        self._projectInfo = {}
         self.initUI()
 
     def initUI(self):
@@ -11,7 +12,7 @@ class ProjectDialog(QDialog):
         self._formerPath = QTextEdit(self)
         self._formerPath.resize(350, 25)
         self._formerPath.move(20, 30)
-        self._formerButton = QPushButton(self)
+        self._formerButton = QPushButton('Open', self)
         self._formerButton.clicked.connect(self.onButtonFormer)
         self._formerButton.resize(55, 25)
         self._formerButton.move(380, 30)
@@ -19,7 +20,7 @@ class ProjectDialog(QDialog):
         self._newerPath = QTextEdit(self)
         self._newerPath.resize(350, 25)
         self._newerPath.move(20, 100)
-        self._newerButton = QPushButton(self)
+        self._newerButton = QPushButton('Open', self)
         self._newerButton.clicked.connect(self.onButtonNewer)
         self._newerButton.resize(55, 25)
         self._newerButton.move(380, 100)
@@ -27,7 +28,7 @@ class ProjectDialog(QDialog):
         self._projectPath = QTextEdit(self)
         self._projectPath.resize(350, 25)
         self._projectPath.move(20, 170)
-        self._projectButton = QPushButton(self)
+        self._projectButton = QPushButton('Save', self)
         self._projectButton.clicked.connect(self.onButtonProject)
         self._projectButton.resize(55, 25)
         self._projectButton.move(380, 170)
@@ -44,16 +45,30 @@ class ProjectDialog(QDialog):
         self.setWindowTitle("New Project")
 
     def onButtonFormer(self):
-        print('former')
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open a exist project file", "",
+                                                  "JPEG Image Files (*.jpg);;TIFF Image Files (*.tif);;All Files (*)")
+        self._formerPath.setText(fileName)
+        print(fileName)
 
     def onButtonNewer(self):
-        print('Newer')
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open a exist project file", "",
+                                                  "JPEG Image Files (*.jpg);;TIFF Image Files (*.tif);;All Files (*)")
+        self._newerPath.setText(fileName)
+        print(fileName)
 
     def onButtonProject(self):
-        print('prject')
+        fileName, _ = QFileDialog.getSaveFileName(self, "Open a exist project file", "",
+                                                  "DataBase Files (*.db);;All Files (*)")
+        self._projectPath.setText(fileName)
+        print(fileName)
 
     def onButtonOK(self):
         print("OK")
+        self._projectInfo['FORMER_IMG'] = self._formerPath.toPlainText()
+        self._projectInfo['NEWER_IMG'] = self._newerPath.toPlainText()
+        self._projectInfo['PROJECT_FILE'] = self._projectPath.toPlainText()
+        self.close()
 
     def onButtonCancel(self):
         print('Cancel')
+        self.close()

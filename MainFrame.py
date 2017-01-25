@@ -81,6 +81,7 @@ class MainApp(QMainWindow):
     def menuNewProject(self):
         newDialog = ProjectDialog()
         newDialog.exec_()
+        print(newDialog._projectInfo)
         self._mainProject = ProjectSet()
 
     def menuOpenProject(self):
