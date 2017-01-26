@@ -15,6 +15,7 @@ class MainApp(QMainWindow):
     def initUI(self):
 
         self.setWindowTitle('C D S P  by hugh')
+        self._mainProject = ProjectSet()
 
         thisMenu = self.menuBar().addMenu('&File')
         newAction = QAction('&New Project', self)
@@ -24,12 +25,13 @@ class MainApp(QMainWindow):
         thisMenu.addAction(newAction)
         openAction = QAction('&Open Project', self)
         openAction.setStatusTip('Open an exist project.')
-
         openAction.setShortcut('Ctrl+O')
         openAction.triggered.connect(self.menuOpenProject)
         thisMenu.addAction(openAction)
+        saveAction = QAction('&Save Project', self)
+        saveAction.setStatusTip('Save this project to a database file.')
+        saveAction.triggered.connect(self.menuSaveProject)
         thisMenu.addSeparator()
-
         exitAction = QAction('&Exit', self)
         exitAction.setShortcut('Ctrl+Q')
         exitAction.setStatusTip('Exit this application.')
@@ -78,11 +80,13 @@ class MainApp(QMainWindow):
 
         self.show()
 
+    def menuSaveProject(self):
+        pass
+
     def menuNewProject(self):
         newDialog = ProjectDialog()
         newDialog.exec_()
         print(newDialog._projectInfo)
-        self._mainProject = ProjectSet()
 
     def menuOpenProject(self):
         fileName, _ = QFileDialog.getOpenFileName(self, "Open a exist project file", "",

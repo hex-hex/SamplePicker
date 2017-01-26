@@ -1,5 +1,4 @@
 from PyQt5.QtWidgets import *
-from SampleProject import *
 
 class ProjectDialog(QDialog):
     def __init__(self, parent=None):
