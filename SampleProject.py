@@ -65,13 +65,33 @@ class ProjectSet():
         if strFilePath[-8:] == '.cdsp.db':
             self._dbPathName = strFilePath
             if not os.path.isfile(strFilePath):
-                conn = sqlite3.connect(strFilePath)
-                conn.execute('''CREATE TABLE sample_location(index_sample INTEGER PRIMARY KEY autoincrement, row int, column int, isSame int)''')
-                conn.execute('''CREATE TABLE image_path(index_image INTEGER PRIMARY KEY, image_path varchar(255), image_description varchar(255)''')
-                #primary key indicates is the image former(0) or newer(1)
-                conn.close()
+                try:
+                    conn = sqlite3.connect(strFilePath)
+                    conn.execute('''CREATE TABLE sample_location(index_sample INTEGER PRIMARY KEY autoincrement, row int, column int, isSame int)''')
+                    conn.execute('''CREATE TABLE image_path(index_image INTEGER PRIMARY KEY, image_path varchar(255), image_description varchar(255))''')
+                    conn.execute('''INSERT INTO image_path(index_image, image_path, image_description) VALUES({0}, '{1}', '{2}')'''.format(
+                        0, self._formerImg.file_path, 'former image'))
+                    conn.execute('''INSERT INTO image_path(index_image, image_path, image_description) VALUES({0}, '{1}', '{2}')'''.format(
+                        1, self._newerImg.file_path, 'newer image'))
+                    #primary key indicates is the image former(0) or newer(1)
+                    conn.commit()
+                    conn.close()
+                    print('Create database successfully.')
+                except Exception as e:
+                    print(e)
             else:
-                pass
+                try:
+                    conn = sqlite3.connect(strFilePath)
+                    content = conn.execute('''SELECT * FROM image_path WHERE index_image = 0''')
+                    imageFormerInfo = content.fetchone()
+                    self.former = imageFormerInfo[1]
+                    content = conn.execute('''SELECT * FROM image_path WHERE index_image = 1''')
+                    imageNewerInfo = content.fetchone()
+                    self.newer = imageNewerInfo[1]
+                    conn.close()
+                    print('Load database successfully.')
+                except Exception as e:
+                    print(e)
 
     @property
     def former(self):
@@ -94,9 +114,8 @@ class ProjectSet():
             try:
                 conn = sqlite3.connect(self.databasePath)
                 for i, sample in enumerate(self._listLocation):
-                   conn.execute(''''INSERT INTO sample_location(row, column, IsSame) VALUES({0},{1},{2})'''.format(
-                                sample[0][0], sample, sample[0][1], sample[1])
-                   )
+                   conn.execute('''INSERT INTO sample_location(row, column, IsSame) VALUES({0},{1},{2})'''.format(
+                                sample[0][0], sample, sample[0][1], sample[1]))
                 conn.commit()
                 self.databasePath = []
                 print('Export data successfully')

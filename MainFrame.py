@@ -54,8 +54,6 @@ class MainApp(QMainWindow):
         self._windowSize = QSize(1024, 600)
         self.resize(self._windowSize.width(), self._windowSize.height())
 
-        self._mainProject = None
-
         self._formerArea = QScrollArea(self)
         self._nextSampleButton = QPushButton('Next Sample', self)
         self._SameSampleButton = QPushButton('Same Type', self)
@@ -74,9 +72,7 @@ class MainApp(QMainWindow):
         self._newerArea.resize((self.size().width() - 150)/2, self.size().height())
         self._newerArea.move((self.size().width() - 150)/2 + 150, self._menuHeight - self._menuHeight)
 
-        self._currentStatusMessgae = 'Everything is ready.'
-
-        self.statusBar().showMessage(self._currentStatusMessgae)
+        self.refreshStatus('Everything is ready.')
 
         self.show()
 
@@ -86,12 +82,23 @@ class MainApp(QMainWindow):
     def menuNewProject(self):
         newDialog = ProjectDialog()
         newDialog.exec_()
-        print(newDialog._projectInfo)
+        if newDialog._confirm:
+            self._mainProject.former = newDialog._projectInfo['FORMER_IMG']
+            self._mainProject.newer = newDialog._projectInfo['NEWER_IMG']
+            self._mainProject.databasePath = newDialog._projectInfo['PROJECT_FILE']
+            self.refreshStatus('Create project successfully.')
+
+    def refreshStatus(self, tipText):
+        self.statusBar().showMessage(tipText)
 
     def menuOpenProject(self):
         fileName, _ = QFileDialog.getOpenFileName(self, "Open a exist project file", "",
                                                   "DataBase Files (*.db);;All Files (*)")
-        if fileName:
+        if len(fileName) < 8:
+            return
+        if fileName[-8:] == '.cdsp.db':
+            self._mainProject.databasePath = fileName
+            self.refreshStatus('Load project successfully.')
             print(fileName)
 
     def menuAboutAction(self):

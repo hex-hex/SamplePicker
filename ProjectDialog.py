@@ -7,6 +7,8 @@ class ProjectDialog(QDialog):
         self.initUI()
 
     def initUI(self):
+        self._confirm = False
+
         self.setFixedSize(450, 270)
         self._formerPath = QTextEdit(self)
         self._formerPath.resize(350, 25)
@@ -47,27 +49,24 @@ class ProjectDialog(QDialog):
         fileName, _ = QFileDialog.getOpenFileName(self, "Open a exist project file", "",
                                                   "JPEG Image Files (*.jpg);;TIFF Image Files (*.tif);;All Files (*)")
         self._formerPath.setText(fileName)
-        print(fileName)
 
     def onButtonNewer(self):
         fileName, _ = QFileDialog.getOpenFileName(self, "Open a exist project file", "",
                                                   "JPEG Image Files (*.jpg);;TIFF Image Files (*.tif);;All Files (*)")
         self._newerPath.setText(fileName)
-        print(fileName)
 
     def onButtonProject(self):
         fileName, _ = QFileDialog.getSaveFileName(self, "Open a exist project file", "",
                                                   "DataBase Files (*.db);;All Files (*)")
+        fileName = fileName[0:-3] + r'.cdsp.db'
         self._projectPath.setText(fileName)
-        print(fileName)
 
     def onButtonOK(self):
-        print("OK")
         self._projectInfo['FORMER_IMG'] = self._formerPath.toPlainText()
         self._projectInfo['NEWER_IMG'] = self._newerPath.toPlainText()
         self._projectInfo['PROJECT_FILE'] = self._projectPath.toPlainText()
+        self._confirm = True
         self.close()
 
     def onButtonCancel(self):
-        print('Cancel')
         self.close()
