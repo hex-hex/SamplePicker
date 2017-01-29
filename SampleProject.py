@@ -12,11 +12,11 @@ class Image():
 
     @property
     def width(self):
-        return self._imgSize[0]
+        return self._imgSize[1]
 
     @property
     def height(self):
-        return self._imgSize[1]
+        return self._imgSize[0]
 
     @property
     def bands(self):
@@ -49,6 +49,16 @@ class ProjectSet():
         self._dbPathName = ''
         self._listLocation = []
         self._sampleSize = 49
+        self._isEmpty = True
+
+    def width(self):
+        return self._formerImg.width
+
+    def height(self):
+        return self._formerImg.height
+
+    def isLoaded(self):
+        return not self._isEmpty
 
     def addLocation(self, x, y, isSame):
         self._listLocation.append([x, y, isSame])
@@ -76,6 +86,7 @@ class ProjectSet():
                     #primary key indicates is the image former(0) or newer(1)
                     conn.commit()
                     conn.close()
+                    self._isEmpty = False
                     print('Create database successfully.')
                 except Exception as e:
                     print(e)
@@ -89,13 +100,14 @@ class ProjectSet():
                     imageNewerInfo = content.fetchone()
                     self.newer = imageNewerInfo[1]
                     conn.close()
+                    self._isEmpty = False
                     print('Load database successfully.')
                 except Exception as e:
                     print(e)
 
     @property
     def former(self):
-        return self._formerImg.file_data
+        return np.array(self._formerImg.file_data)
 
     @former.setter
     def former(self, strFilePath):
@@ -103,7 +115,7 @@ class ProjectSet():
 
     @property
     def newer(self):
-        return self._newerImg.file_data
+        return np.array(self._newerImg.file_data)
 
     @newer.setter
     def newer(self, strFilePath):

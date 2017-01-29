@@ -1,7 +1,8 @@
 import sys
 import webbrowser
-from PyQt5.QtCore import *
+import numpy as np
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from SampleProject import *
 from ProjectDialog import *
@@ -16,6 +17,7 @@ class MainApp(QMainWindow):
 
         self.setWindowTitle('C D S P  by hugh')
         self._mainProject = ProjectSet()
+        self._menuHeight = 20
 
         thisMenu = self.menuBar().addMenu('&File')
         newAction = QAction('&New Project', self)
@@ -52,28 +54,27 @@ class MainApp(QMainWindow):
         thisMenu.addAction(aboutAction)
 
         self._windowSize = QSize(1024, 600)
-        self.resize(self._windowSize.width(), self._windowSize.height())
 
         self._formerArea = QScrollArea(self)
-        self._nextSampleButton = QPushButton('Next Sample', self)
-        self._SameSampleButton = QPushButton('Same Type', self)
-        self._DifferentSampleButton = QPushButton('Different Type', self)
-        self._newerArea = QScrollArea(self)
+        self._formerView = QLabel()
+        self._formerArea.setWidget(self._formerView)
 
-        self._menuHeight = 20
-        self._formerArea.resize((self.size().width() - 150)/2, self.size().height() - self._menuHeight)
-        self._formerArea.move(0, self._menuHeight)
+        self._newerArea = QScrollArea(self)
+        self._newerView = QLabel()
+        self._newerArea.setWidget(self._newerView)
+
+        self._nextSampleButton = QPushButton('Next Sample', self)
         self._nextSampleButton.resize(150, 25)
         self._nextSampleButton.move((self.size().width() - 150)/2, self._menuHeight)
-        self._SameSampleButton.resize(150, 25)
-        self._SameSampleButton.move((self.size().width() - 150)/2, self._menuHeight + 35)
+        self._DifferentSampleButton = QPushButton('Different Type', self)
         self._DifferentSampleButton.resize(150, 25)
         self._DifferentSampleButton.move((self.size().width() - 150)/2, self._menuHeight + 70)
-        self._newerArea.resize((self.size().width() - 150)/2, self.size().height())
-        self._newerArea.move((self.size().width() - 150)/2 + 150, self._menuHeight - self._menuHeight)
+        self._SameSampleButton = QPushButton('Same Type', self)
+        self._SameSampleButton.move((self.size().width() - 150)/2, self._menuHeight + 35)
+        self._SameSampleButton.resize(150, 25)
 
+        self.resize(self._windowSize.width(), self._windowSize.height())
         self.refreshStatus('Everything is ready.')
-
         self.show()
 
     def menuSaveProject(self):
@@ -86,6 +87,7 @@ class MainApp(QMainWindow):
             self._mainProject.former = newDialog._projectInfo['FORMER_IMG']
             self._mainProject.newer = newDialog._projectInfo['NEWER_IMG']
             self._mainProject.databasePath = newDialog._projectInfo['PROJECT_FILE']
+            self.loadImages()
             self.refreshStatus('Create project successfully.')
 
     def refreshStatus(self, tipText):
@@ -98,8 +100,22 @@ class MainApp(QMainWindow):
             return
         if fileName[-8:] == '.cdsp.db':
             self._mainProject.databasePath = fileName
+            self.loadImages()
             self.refreshStatus('Load project successfully.')
-            print(fileName)
+
+    def loadImages(self):
+        if self._mainProject.isLoaded():
+            try:
+                npImg = self._mainProject.former
+                image = QImage(npImg.data, npImg.shape[1], npImg.shape[0], npImg.shape[1] * 3, QImage.Format_RGB888)
+                self._formerView.setPixmap(QPixmap(image))
+                self._formerView.resize(self._mainProject.width(), self._mainProject.height())
+                npImg = self._mainProject.newer
+                image = QImage(npImg.data, npImg.shape[1], npImg.shape[0], npImg.shape[1] * 3, QImage.Format_RGB888)
+                self._newerView.setPixmap(QPixmap(image))
+                self._newerView.resize(self._mainProject.width(), self._mainProject.height())
+            except Exception as e:
+                print(e)
 
     def menuAboutAction(self):
         aboutDialog = AboutDialog()
@@ -114,20 +130,14 @@ class MainApp(QMainWindow):
         if self._windowSize.height() > self.size().height():
             self.resize(self.size().width(), self._windowSize.height())
 
-        self._formerArea.resize((self.size().width() - 150)/2, self.size().height())
-        self._formerArea.move(0, self._menuHeight)
-        self._nextSampleButton.resize(150, 25)
         self._nextSampleButton.move((self.size().width() - 150)/2, self._menuHeight)
-        self._SameSampleButton.resize(150, 25)
         self._SameSampleButton.move((self.size().width() - 150)/2, self._menuHeight + 35)
-        self._DifferentSampleButton.resize(150, 25)
         self._DifferentSampleButton.move((self.size().width() - 150)/2, self._menuHeight + 70)
-        self._newerArea.resize((self.size().width() - 150)/2, self.size().height())
+
+        self._formerArea.resize((self.size().width() - 150)/2, self.size().height() - self._menuHeight * 2)
+        self._formerArea.move(0, self._menuHeight)
+        self._newerArea.resize((self.size().width() - 150)/2, self.size().height() - self._menuHeight * 2)
         self._newerArea.move((self.size().width() - 150)/2 + 150, self._menuHeight)
-
-    def redjustWiget(self):
-        pass
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
