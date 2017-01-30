@@ -58,10 +58,14 @@ class MainApp(QMainWindow):
         self._formerArea = QScrollArea(self)
         self._formerView = QLabel()
         self._formerArea.setWidget(self._formerView)
+        self._formerArea.horizontalScrollBar().sliderMoved.connect(self.onFormerHorizontalMoved)
+        self._formerArea.verticalScrollBar().sliderMoved.connect(self.onFormerVerticalMoved)
 
         self._newerArea = QScrollArea(self)
         self._newerView = QLabel()
         self._newerArea.setWidget(self._newerView)
+        self._newerArea.horizontalScrollBar().sliderMoved.connect(self.onNewerHorizontalMoved)
+        self._newerArea.verticalScrollBar().sliderMoved.connect(self.onNewerVerticalMoved)
 
         self._nextSampleButton = QPushButton('Next Sample', self)
         self._nextSampleButton.resize(150, 25)
@@ -76,6 +80,18 @@ class MainApp(QMainWindow):
         self.resize(self._windowSize.width(), self._windowSize.height())
         self.refreshStatus('Everything is ready.')
         self.show()
+
+    def onFormerHorizontalMoved(self):
+        self._newerArea.horizontalScrollBar().setValue(self._formerArea.horizontalScrollBar().value())
+
+    def onFormerVerticalMoved(self):
+        self._newerArea.verticalScrollBar().setValue(self._formerArea.verticalScrollBar().value())
+
+    def onNewerHorizontalMoved(self):
+        self._formerArea.horizontalScrollBar().setValue(self._newerArea.horizontalScrollBar().value)
+
+    def onNewerVerticalMoved(self):
+        self._formerArea.verticalScrollBar().setValue(self._newerArea.verticalScrollBar().value())
 
     def menuSaveProject(self):
         pass
