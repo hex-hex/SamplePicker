@@ -14,10 +14,11 @@ class MainApp(QMainWindow):
         self.initUI()
 
     def initUI(self):
+        self.m_currentLocation = np.array([0, 0])
 
         self.setWindowTitle('C D S P  by hugh')
-        self._mainProject = ProjectSet()
-        self._menuHeight = 20
+        self.m_mainProject = ProjectSet()
+        self.m_menuHeight = 20
 
         thisMenu = self.menuBar().addMenu('&File')
         newAction = QAction('&New Project', self)
@@ -53,45 +54,89 @@ class MainApp(QMainWindow):
         aboutAction.triggered.connect(self.menuAboutAction)
         thisMenu.addAction(aboutAction)
 
-        self._windowSize = QSize(1024, 600)
+        self.m_windowSize = QSize(1024, 600)
 
-        self._formerArea = QScrollArea(self)
-        self._formerView = QLabel()
-        self._formerArea.setWidget(self._formerView)
-        self._formerArea.horizontalScrollBar().sliderMoved.connect(self.onFormerHorizontalMoved)
-        self._formerArea.verticalScrollBar().sliderMoved.connect(self.onFormerVerticalMoved)
+        self.m_formerArea = QScrollArea(self)
+        self.m_formerView = QLabel()
+        self.m_formerArea.setWidget(self.m_formerView)
+        self.m_formerArea.horizontalScrollBar().sliderMoved.connect(self.onFormerHorizontalMoved)
+        self.m_formerArea.verticalScrollBar().sliderMoved.connect(self.onFormerVerticalMoved)
 
-        self._newerArea = QScrollArea(self)
-        self._newerView = QLabel()
-        self._newerArea.setWidget(self._newerView)
-        self._newerArea.horizontalScrollBar().sliderMoved.connect(self.onNewerHorizontalMoved)
-        self._newerArea.verticalScrollBar().sliderMoved.connect(self.onNewerVerticalMoved)
+        self.m_newerArea = QScrollArea(self)
+        self.m_newerView = QLabel()
+        self.m_newerArea.setWidget(self.m_newerView)
+        self.m_newerArea.horizontalScrollBar().sliderMoved.connect(self.onNewerHorizontalMoved)
+        self.m_newerArea.verticalScrollBar().sliderMoved.connect(self.onNewerVerticalMoved)
 
-        self._nextSampleButton = QPushButton('Next Sample', self)
-        self._nextSampleButton.resize(150, 25)
-        self._nextSampleButton.move((self.size().width() - 150)/2, self._menuHeight)
-        self._DifferentSampleButton = QPushButton('Different Type', self)
-        self._DifferentSampleButton.resize(150, 25)
-        self._DifferentSampleButton.move((self.size().width() - 150)/2, self._menuHeight + 70)
-        self._SameSampleButton = QPushButton('Same Type', self)
-        self._SameSampleButton.move((self.size().width() - 150)/2, self._menuHeight + 35)
-        self._SameSampleButton.resize(150, 25)
+        self.m_formerWindow = QLabel(self)
+        self.m_formerWindow.resize(self.m_mainProject.sampleSize, self.m_mainProject.sampleSize)
+        self.m_newerWindow = QLabel(self)
+        self.m_newerWindow.resize(self.m_mainProject.sampleSize, self.m_mainProject.sampleSize)
 
-        self.resize(self._windowSize.width(), self._windowSize.height())
+
+        self.m_nextSampleButton = QPushButton('Next Sample', self)
+        self.m_nextSampleButton.resize(150, 25)
+        self.m_nextSampleButton.clicked.connect(self.onNextButton)
+        self.m_DifferentSampleButton = QPushButton('Different Type', self)
+        self.m_DifferentSampleButton.resize(150, 25)
+        self.m_DifferentSampleButton.clicked.connect(self.onDifferentButton)
+        self.m_SameSampleButton = QPushButton('Same Type', self)
+        self.m_SameSampleButton.resize(150, 25)
+        self.m_SameSampleButton.clicked.connect(self.onSameButton)
+
+        self.resize(self.m_windowSize.width(), self.m_windowSize.height())
         self.refreshStatus('Everything is ready.')
         self.show()
 
+    def randWindow(self):
+        halfWindow = np.floor(self.m_mainProject.sampleSize / 2).astype(int)
+        randLocation = np.array([np.random.rand() * self.m_mainProject.width(),
+                                 np.random.rand() * self.m_mainProject.height()])
+        randLocation = np.floor(randLocation).astype(int)
+        if (randLocation[0] - halfWindow < 0 or
+            randLocation[0] + halfWindow + 1 > self.m_mainProject.width() or
+            randLocation[1] - halfWindow < 0 or
+            randLocation[1] + halfWindow + 1 > self.m_mainProject.height()):
+            return  self.randWindow()
+        else:
+            gridWindow = np.meshgrid(
+                np.array(randLocation[0] - halfWindow,
+                         randLocation[0] + halfWindow),
+                np.array(randLocation[1] - halfWindow,
+                         randLocation[1] + halfWindow)
+            )
+            pixelCount = self.m_mainProject.sampleSize ** 2
+            gridWindow = np.hstack((gridWindow[0].reshape(pixelCount, 1),
+                                    gridWindow[1].reshale(pixelCount, 1)))
+            gridWindow = np.delete(gridWindow, np.ceil(pixelCount / 2), axis=0)
+
+            formerImageWindow = self.m_mainProject.former[randLocation[0] - halfWindow:randLocation[0] + halfWindow + 1,
+                                randLocation[1] - halfWindow:randLocation[1] + halfWindow + 1]
+
+            newerImageWindow = self.m_mainProject.newer[randLocation[0] - halfWindow:randLocation[0] + halfWindow + 1,
+                                randLocation[1] - halfWindow:randLocation[1] + halfWindow + 1]
+
+            return randLocation, formerImageWindow, newerImageWindow, gridWindow
+
+    def onNextButton(self):
+        sampleLocation, formerWindow, newerWindow = self.randWindow()
+
+    def onDifferentButton(self):
+        pass
+    def onSameButton(self):
+        pass
+
     def onFormerHorizontalMoved(self):
-        self._newerArea.horizontalScrollBar().setValue(self._formerArea.horizontalScrollBar().value())
+        self.m_newerArea.horizontalScrollBar().setValue(self.m_formerArea.horizontalScrollBar().value())
 
     def onFormerVerticalMoved(self):
-        self._newerArea.verticalScrollBar().setValue(self._formerArea.verticalScrollBar().value())
+        self.m_newerArea.verticalScrollBar().setValue(self.m_formerArea.verticalScrollBar().value())
 
     def onNewerHorizontalMoved(self):
-        self._formerArea.horizontalScrollBar().setValue(self._newerArea.horizontalScrollBar().value)
+        self.m_formerArea.horizontalScrollBar().setValue(self.m_newerArea.horizontalScrollBar().value)
 
     def onNewerVerticalMoved(self):
-        self._formerArea.verticalScrollBar().setValue(self._newerArea.verticalScrollBar().value())
+        self.m_formerArea.verticalScrollBar().setValue(self.m_newerArea.verticalScrollBar().value())
 
     def menuSaveProject(self):
         pass
@@ -100,9 +145,9 @@ class MainApp(QMainWindow):
         newDialog = ProjectDialog()
         newDialog.exec_()
         if newDialog._confirm:
-            self._mainProject.former = newDialog._projectInfo['FORMER_IMG']
-            self._mainProject.newer = newDialog._projectInfo['NEWER_IMG']
-            self._mainProject.databasePath = newDialog._projectInfo['PROJECT_FILE']
+            self.m_mainProject.former = newDialog._projectInfo['FORMER_IMG']
+            self.m_mainProject.newer = newDialog._projectInfo['NEWER_IMG']
+            self.m_mainProject.databasePath = newDialog._projectInfo['PROJECT_FILE']
             self.loadImages()
             self.refreshStatus('Create project successfully.')
 
@@ -115,21 +160,21 @@ class MainApp(QMainWindow):
         if len(fileName) < 8:
             return
         if fileName[-8:] == '.cdsp.db':
-            self._mainProject.databasePath = fileName
+            self.m_mainProject.databasePath = fileName
             self.loadImages()
             self.refreshStatus('Load project successfully.')
 
     def loadImages(self):
-        if self._mainProject.isLoaded():
+        if self.m_mainProject.isLoaded():
             try:
-                npImg = self._mainProject.former
+                npImg = self.m_mainProject.former
                 image = QImage(npImg.data, npImg.shape[1], npImg.shape[0], npImg.shape[1] * 3, QImage.Format_RGB888)
-                self._formerView.setPixmap(QPixmap(image))
-                self._formerView.resize(self._mainProject.width(), self._mainProject.height())
-                npImg = self._mainProject.newer
+                self.m_formerView.setPixmap(QPixmap(image))
+                self.m_formerView.resize(self.m_mainProject.width(), self.m_mainProject.height())
+                npImg = self.m_mainProject.newer
                 image = QImage(npImg.data, npImg.shape[1], npImg.shape[0], npImg.shape[1] * 3, QImage.Format_RGB888)
-                self._newerView.setPixmap(QPixmap(image))
-                self._newerView.resize(self._mainProject.width(), self._mainProject.height())
+                self.m_newerView.setPixmap(QPixmap(image))
+                self.m_newerView.resize(self.m_mainProject.width(), self.m_mainProject.height())
             except Exception as e:
                 print(e)
 
@@ -141,19 +186,19 @@ class MainApp(QMainWindow):
         webbrowser.open('https://github.com/hex-hex/SamplePicker')
 
     def resizeEvent(self, *args, **kwargs):
-        if self._windowSize.width() > self.size().width():
-            self.resize(self._windowSize.width(), self.size().height())
-        if self._windowSize.height() > self.size().height():
-            self.resize(self.size().width(), self._windowSize.height())
+        if self.m_windowSize.width() > self.size().width():
+            self.resize(self.m_windowSize.width(), self.size().height())
+        if self.m_windowSize.height() > self.size().height():
+            self.resize(self.size().width(), self.m_windowSize.height())
 
-        self._nextSampleButton.move((self.size().width() - 150)/2, self._menuHeight)
-        self._SameSampleButton.move((self.size().width() - 150)/2, self._menuHeight + 35)
-        self._DifferentSampleButton.move((self.size().width() - 150)/2, self._menuHeight + 70)
+        self.m_nextSampleButton.move((self.size().width() - 150)/2, self.m_menuHeight)
+        self.m_SameSampleButton.move((self.size().width() - 150)/2, self.m_menuHeight + 35)
+        self.m_DifferentSampleButton.move((self.size().width() - 150)/2, self.m_menuHeight + 70)
 
-        self._formerArea.resize((self.size().width() - 150)/2, self.size().height() - self._menuHeight * 2)
-        self._formerArea.move(0, self._menuHeight)
-        self._newerArea.resize((self.size().width() - 150)/2, self.size().height() - self._menuHeight * 2)
-        self._newerArea.move((self.size().width() - 150)/2 + 150, self._menuHeight)
+        self.m_formerArea.resize((self.size().width() - 150)/2, self.size().height() - self.m_menuHeight * 2)
+        self.m_formerArea.move(0, self.m_menuHeight)
+        self.m_newerArea.resize((self.size().width() - 150)/2, self.size().height() - self.m_menuHeight * 2)
+        self.m_newerArea.move((self.size().width() - 150)/2 + 150, self.m_menuHeight)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
