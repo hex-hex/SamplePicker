@@ -1,11 +1,11 @@
-## Change Detection Sample Picker
+# Change Detection Sample Picker
 This is a remote sensing change detection sample picking program
 
 You may need these library to run the program:
-#numpy
-#pandas
-#scikit-image
-#PyQt5
+##numpy
+##pandas
+##scikit-image
+##PyQt5
 
 Workflow:
 1. Create a new project
