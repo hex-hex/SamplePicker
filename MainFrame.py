@@ -32,8 +32,10 @@ class MainApp(QMainWindow):
         openAction.triggered.connect(self.menuOpenProject)
         thisMenu.addAction(openAction)
         saveAction = QAction('&Save Project', self)
+        saveAction.setShortcut('Ctrl+s')
         saveAction.setStatusTip('Save this project to a database file.')
         saveAction.triggered.connect(self.menuSaveProject)
+        thisMenu.addAction(saveAction)
         thisMenu.addSeparator()
         exitAction = QAction('&Exit', self)
         exitAction.setShortcut('Ctrl+Q')
@@ -78,12 +80,17 @@ class MainApp(QMainWindow):
         self.m_nextSampleButton = QPushButton('Next Sample', self)
         self.m_nextSampleButton.resize(self.m_widthButton, 25)
         self.m_nextSampleButton.clicked.connect(self.onNextButton)
+        self.m_nextSampleButton.setDisabled(True)
+
         self.m_DifferentSampleButton = QPushButton('Different Type', self)
         self.m_DifferentSampleButton.resize(self.m_widthButton, 25)
         self.m_DifferentSampleButton.clicked.connect(self.onDifferentButton)
+        self.m_DifferentSampleButton.setDisabled(True)
+
         self.m_SameSampleButton = QPushButton('Same Type', self)
         self.m_SameSampleButton.resize(self.m_widthButton, 25)
         self.m_SameSampleButton.clicked.connect(self.onSameButton)
+        self.m_SameSampleButton.setDisabled(True)
 
         self.resize(self.m_windowSize.width(), self.m_windowSize.height())
         self.refreshStatus('Everything is ready.')
@@ -133,6 +140,14 @@ class MainApp(QMainWindow):
                                                      newerWindow.shape[0],
                                                      newerWindow.shape[1] * 3,
                                                      QImage.Format_RGB888)))
+        self.m_formerArea.horizontalScrollBar().setValue(sampleLocation[0] -
+                                                         self.m_formerArea.width() / 2)
+        self.m_formerArea.verticalScrollBar().setValue(sampleLocation[1] -
+                                                       self.m_formerArea.height() / 2)
+        self.m_newerArea.horizontalScrollBar().setValue(sampleLocation[0] -
+                                                        self.m_newerArea.width() / 2)
+        self.m_newerArea.verticalScrollBar().setValue(sampleLocation[1] -
+                                                      self.m_newerArea.height() / 2)
         self.refreshStatus('Sample loaction: {0},{1}'.format(sampleLocation[0], sampleLocation[1]))
 
     def onDifferentButton(self):
@@ -147,23 +162,29 @@ class MainApp(QMainWindow):
         self.m_newerArea.verticalScrollBar().setValue(self.m_formerArea.verticalScrollBar().value())
 
     def onNewerHorizontalMoved(self):
-        self.m_formerArea.horizontalScrollBar().setValue(self.m_newerArea.horizontalScrollBar().value)
+        self.m_formerArea.horizontalScrollBar().setValue(self.m_newerArea.horizontalScrollBar().value())
 
     def onNewerVerticalMoved(self):
         self.m_formerArea.verticalScrollBar().setValue(self.m_newerArea.verticalScrollBar().value())
 
     def menuSaveProject(self):
-        pass
+        self.refreshStatus('project is saved')
 
     def menuNewProject(self):
         newDialog = ProjectDialog()
-        newDialog.exec_()
-        if newDialog._confirm:
-            self.m_mainProject.former = newDialog._projectInfo['FORMER_IMG']
-            self.m_mainProject.newer = newDialog._projectInfo['NEWER_IMG']
-            self.m_mainProject.databasePath = newDialog._projectInfo['PROJECT_FILE']
-            self.loadImages()
-            self.refreshStatus('Create project successfully.')
+        try:
+            newDialog.exec_()
+            if newDialog.m_confirm:
+                self.m_mainProject.former = newDialog._projectInfo['FORMER_IMG']
+                self.m_mainProject.newer = newDialog._projectInfo['NEWER_IMG']
+                self.m_mainProject.databasePath = newDialog._projectInfo['PROJECT_FILE']
+                self.loadImages()
+                self.refreshStatus('Create project successfully.')
+                self.m_nextSampleButton.setDisabled(False)
+                self.m_DifferentSampleButton.setDisabled(False)
+                self.m_SameSampleButton.setDisabled(False)
+        except Exception as e:
+            print(e)
 
     def refreshStatus(self, tipText):
         self.statusBar().showMessage(tipText)
@@ -178,6 +199,9 @@ class MainApp(QMainWindow):
             self.loadImages()
             self.refreshStatus('Load project successfully. Image Width:{0}, Image Height{1}'.format(
                 self.m_mainProject.width(), self.m_mainProject.height()))
+            self.m_nextSampleButton.setDisabled(False)
+            self.m_DifferentSampleButton.setDisabled(False)
+            self.m_SameSampleButton.setDisabled(False)
 
     def loadImages(self):
         if self.m_mainProject.isLoaded():
