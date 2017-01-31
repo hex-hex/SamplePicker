@@ -1,4 +1,4 @@
-# SamplePicker
+## Change Detection Sample Picker
 This is a remote sensing change detection sample picking program
 
 You may need these library to run the program:
