@@ -76,7 +76,7 @@ class ProjectSet():
     @property
     def databasePath(self):
         if len(self.m_dbPathName) != 0:
-            return self
+            return self.m_dbPathName
         else:
             return None
 
@@ -136,15 +136,24 @@ class ProjectSet():
             try:
                 conn = sqlite3.connect(self.databasePath)
                 for i, sample in enumerate(self.m_listLocation):
-                   conn.execute('''INSERT INTO sample_location(row, column, IsSame) VALUES({0},{1},{2})'''.format(
-                                sample[0][0], sample, sample[0][1], sample[1]))
+                    conn.execute('''INSERT INTO sample_location(row, column, IsSame) VALUES({0},{1},{2})'''.format(
+                                sample[0], sample[1], sample[2]))
                 conn.commit()
                 self.databasePath = []
                 print('Export data successfully')
+                conn.close()
             except Exception as e:
                 print(e)
 
     def getDB(self):
-        self.exportDB()
-        pass
+        try:
+            conn = sqlite3.connect(self.databasePath)
+            content = conn.execute('''SELECT * FROM sample_location''')
+            content = content.fetchall()
+            conn.close()
+        except Exception as e:
+            print(e)
+
+        return content
+
 

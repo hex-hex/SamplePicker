@@ -17,6 +17,11 @@ class ProjectDialog(QDialog):
         self.m_formerButton.clicked.connect(self.onButtonFormer)
         self.m_formerButton.resize(55, 25)
         self.m_formerButton.move(380, 30)
+        
+        self.m_sampleSize = QTextEdit(self)
+        self.m_sampleSize.resize(100,25)
+        self.m_sampleSize.move(90, 220)
+        self.m_sampleSize.setText('121')
 
         self.m_newerPath = QTextEdit(self)
         self.m_newerPath.resize(350, 25)
@@ -43,6 +48,7 @@ class ProjectDialog(QDialog):
         self.m_cancelButton.move(340, 220)
         self.m_cancelButton.clicked.connect(self.onButtonCancel)
 
+
         self.setWindowTitle("New Project")
 
     def onButtonFormer(self):
@@ -65,6 +71,7 @@ class ProjectDialog(QDialog):
         self.m_projectInfo['FORMER_IMG'] = self.m_formerPath.toPlainText()
         self.m_projectInfo['NEWER_IMG'] = self.m_newerPath.toPlainText()
         self.m_projectInfo['PROJECT_FILE'] = self.m_projectPath.toPlainText()
+        self.m_projectInfo['SAMPLE_SIZE'] = self.m_sampleSize.toPlainText()
         self.m_confirm = True
         self.close()
 
