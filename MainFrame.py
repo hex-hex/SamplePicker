@@ -74,14 +74,15 @@ class MainApp(QMainWindow):
         self.m_newerWindow.resize(self.m_mainProject.sampleSize, self.m_mainProject.sampleSize)
 
 
+        self.m_widthButton = 150
         self.m_nextSampleButton = QPushButton('Next Sample', self)
-        self.m_nextSampleButton.resize(150, 25)
+        self.m_nextSampleButton.resize(self.m_widthButton, 25)
         self.m_nextSampleButton.clicked.connect(self.onNextButton)
         self.m_DifferentSampleButton = QPushButton('Different Type', self)
-        self.m_DifferentSampleButton.resize(150, 25)
+        self.m_DifferentSampleButton.resize(self.m_widthButton, 25)
         self.m_DifferentSampleButton.clicked.connect(self.onDifferentButton)
         self.m_SameSampleButton = QPushButton('Same Type', self)
-        self.m_SameSampleButton.resize(150, 25)
+        self.m_SameSampleButton.resize(self.m_widthButton, 25)
         self.m_SameSampleButton.clicked.connect(self.onSameButton)
 
         self.resize(self.m_windowSize.width(), self.m_windowSize.height())
@@ -100,26 +101,39 @@ class MainApp(QMainWindow):
             return  self.randWindow()
         else:
             gridWindow = np.meshgrid(
-                np.array(randLocation[0] - halfWindow,
-                         randLocation[0] + halfWindow),
-                np.array(randLocation[1] - halfWindow,
-                         randLocation[1] + halfWindow)
+                np.arange(randLocation[0] - halfWindow,
+                         randLocation[0] + halfWindow + 1),
+                np.arange(randLocation[1] - halfWindow,
+                         randLocation[1] + halfWindow + 1)
             )
             pixelCount = self.m_mainProject.sampleSize ** 2
             gridWindow = np.hstack((gridWindow[0].reshape(pixelCount, 1),
-                                    gridWindow[1].reshale(pixelCount, 1)))
+                                    gridWindow[1].reshape(pixelCount, 1)))
             gridWindow = np.delete(gridWindow, np.ceil(pixelCount / 2), axis=0)
 
-            formerImageWindow = self.m_mainProject.former[randLocation[0] - halfWindow:randLocation[0] + halfWindow + 1,
-                                randLocation[1] - halfWindow:randLocation[1] + halfWindow + 1]
+            formerImageWindow = self.m_mainProject.former[randLocation[1] - halfWindow:randLocation[1] + halfWindow + 1,
+                                randLocation[0] - halfWindow:randLocation[0] + halfWindow + 1, :]
 
-            newerImageWindow = self.m_mainProject.newer[randLocation[0] - halfWindow:randLocation[0] + halfWindow + 1,
-                                randLocation[1] - halfWindow:randLocation[1] + halfWindow + 1]
+            newerImageWindow = self.m_mainProject.newer[randLocation[1] - halfWindow:randLocation[1] + halfWindow + 1,
+                                randLocation[0] - halfWindow:randLocation[0] + halfWindow + 1, :]
 
             return randLocation, formerImageWindow, newerImageWindow, gridWindow
 
     def onNextButton(self):
-        sampleLocation, formerWindow, newerWindow = self.randWindow()
+        sampleLocation, formerWindow, newerWindow, _  = self.randWindow()
+        formerWindow = np.array(formerWindow)
+        newerWindow = np.array(newerWindow)
+        self.m_formerWindow.setPixmap(QPixmap(QImage(formerWindow.data,
+                                                     formerWindow.shape[1],
+                                                     formerWindow.shape[0],
+                                                     formerWindow.shape[1] * 3,
+                                                     QImage.Format_RGB888)))
+        self.m_newerWindow.setPixmap(QPixmap(QImage(newerWindow.data,
+                                                     newerWindow.shape[1],
+                                                     newerWindow.shape[0],
+                                                     newerWindow.shape[1] * 3,
+                                                     QImage.Format_RGB888)))
+        self.refreshStatus('Sample loaction: {0},{1}'.format(sampleLocation[0], sampleLocation[1]))
 
     def onDifferentButton(self):
         pass
@@ -162,7 +176,8 @@ class MainApp(QMainWindow):
         if fileName[-8:] == '.cdsp.db':
             self.m_mainProject.databasePath = fileName
             self.loadImages()
-            self.refreshStatus('Load project successfully.')
+            self.refreshStatus('Load project successfully. Image Width:{0}, Image Height{1}'.format(
+                self.m_mainProject.width(), self.m_mainProject.height()))
 
     def loadImages(self):
         if self.m_mainProject.isLoaded():
@@ -191,14 +206,18 @@ class MainApp(QMainWindow):
         if self.m_windowSize.height() > self.size().height():
             self.resize(self.size().width(), self.m_windowSize.height())
 
-        self.m_nextSampleButton.move((self.size().width() - 150)/2, self.m_menuHeight)
-        self.m_SameSampleButton.move((self.size().width() - 150)/2, self.m_menuHeight + 35)
-        self.m_DifferentSampleButton.move((self.size().width() - 150)/2, self.m_menuHeight + 70)
+        self.m_nextSampleButton.move((self.size().width() - self.m_widthButton)/2, self.m_menuHeight)
+        self.m_SameSampleButton.move((self.size().width() - self.m_widthButton)/2, self.m_menuHeight + 35)
+        self.m_DifferentSampleButton.move((self.size().width() - self.m_widthButton)/2, self.m_menuHeight + 70)
 
-        self.m_formerArea.resize((self.size().width() - 150)/2, self.size().height() - self.m_menuHeight * 2)
+        self.m_formerWindow.move((self.size().width() - self.m_mainProject.sampleSize)/2, self.m_menuHeight + 150)
+        self.m_newerWindow.move((self.size().width() - self.m_mainProject.sampleSize)/2, self.m_menuHeight + 200 + self.m_mainProject.sampleSize)
+
+        self.m_formerArea.resize((self.size().width() - self.m_widthButton)/2, self.size().height() - self.m_menuHeight * 2)
         self.m_formerArea.move(0, self.m_menuHeight)
-        self.m_newerArea.resize((self.size().width() - 150)/2, self.size().height() - self.m_menuHeight * 2)
-        self.m_newerArea.move((self.size().width() - 150)/2 + 150, self.m_menuHeight)
+        self.m_newerArea.resize((self.size().width() - self.m_widthButton)/2, self.size().height() - self.m_menuHeight * 2)
+        self.m_newerArea.move((self.size().width() - self.m_widthButton)/2 + self.m_widthButton, self.m_menuHeight)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

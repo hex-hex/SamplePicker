@@ -48,7 +48,7 @@ class ProjectSet():
         self.m_newerImg = Image()
         self.m_dbPathName = ''
         self.m_listLocation = []
-        self.m_sampleSize = 49
+        self.m_sampleSize = 121
         self.m_isEmpty = True
 
     @property
