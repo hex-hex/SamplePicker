@@ -9,6 +9,26 @@ class ProjectDialog(QDialog):
     def initUI(self):
         self.m_confirm = False
 
+        formerLabel = QLabel(self)
+        formerLabel.resize(150,25)
+        formerLabel.move(20,5)
+        formerLabel.setText('Select the former image:')
+
+        newerLabel = QLabel(self)
+        newerLabel.resize(150,25)
+        newerLabel.move(20, 75)
+        newerLabel.setText('Select the newer image:')
+
+        databaseLabel = QLabel(self)
+        databaseLabel.resize(150,25)
+        databaseLabel.move(20, 145)
+        databaseLabel.setText('Select where to save the project:')
+
+        sizeLabel = QLabel(self)
+        sizeLabel.resize(150, 25)
+        sizeLabel.move(20, 220)
+        sizeLabel.setText('Sample Size:')
+
         self.setFixedSize(450, 270)
         self.m_formerPath = QTextEdit(self)
         self.m_formerPath.resize(350, 25)
@@ -20,7 +40,7 @@ class ProjectDialog(QDialog):
         
         self.m_sampleSize = QTextEdit(self)
         self.m_sampleSize.resize(100,25)
-        self.m_sampleSize.move(90, 220)
+        self.m_sampleSize.move(95, 220)
         self.m_sampleSize.setText('121')
 
         self.m_newerPath = QTextEdit(self)
